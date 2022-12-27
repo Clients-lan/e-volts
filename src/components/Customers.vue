@@ -98,7 +98,7 @@ export default {
             .then((user) => {
                 let u = user.user
                 this.saveUser(u)
-                mailer(u.email, 'Invitation', 'Hello there you have been invited')
+                mailer(u.email, 'Invitation', `Hello there you have been invited to e-volts Your temporary password is 1234567. Please login here ${location.origin}/login`)
             }).catch((err) => {
                 let error = loginErr(err.message)
                 message.error(error)
