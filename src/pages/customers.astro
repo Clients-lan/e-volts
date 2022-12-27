@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.vue'
+import Customers from '../components/Customers.vue'
+---
+
+<Layout title="Big brain">
+    <Navbar client:only="vue" />
+    <Customers client:load />
+</Layout>

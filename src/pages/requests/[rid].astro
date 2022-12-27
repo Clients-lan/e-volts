@@ -1,0 +1,16 @@
+---
+const { rid } = Astro.params;
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.vue'
+import ReqDetail from '../../components/ReqDetail.vue';
+
+---
+
+<Layout title="Requests">
+    <Navbar client:load />
+    <ReqDetail par={rid} client:load />
+</Layout>
+
+
+
+

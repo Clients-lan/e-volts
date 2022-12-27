@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.vue'
+import RequestPage from '../../components/RequestPage.vue'
+
+---
+
+<Layout title="Requests">
+    <Navbar client:load />
+    <RequestPage client:load />
+</Layout>
+

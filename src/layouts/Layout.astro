@@ -1,0 +1,110 @@
+---
+export interface Props {
+	title?: string
+}
+
+const { title = 'Hey there' } = Astro.props;
+import 'ant-design-vue/dist/antd.css';
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+
+<style lang="scss" is:global>
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&display=swap');
+
+body{
+    font-family: 'Hanken Grotesk', sans-serif;
+    background-color: #f4f5f7;
+    margin: 0px;
+}
+
+.main-panel{
+    max-width: 940px;
+    margin: 130px auto 50px auto;
+	@media (max-width:900px) {
+		padding: 0 15px;
+	}
+}
+
+.ant-tag{
+	text-transform: uppercase;
+	font-size: .7rem;
+}
+hr{
+	border: none;
+	border-bottom: 1px solid  #d2d6dc;
+}
+
+.flex{
+	display: flex;
+}
+.grid{
+	display: grid;
+	grid-gap: 10px;
+	&.grid-2{ grid-template-columns: repeat(2, 1fr) }
+	&.grid-3{ grid-template-columns: repeat(3, 1fr) }
+}
+.item-fr{
+	float: right;
+}
+.width-2{
+	width: 50%;
+	overflow: hidden;
+}
+
+.center{
+	text-align: center;
+}
+.align-r{text-align: right}
+
+
+.mt-10{margin-top: 10px;}
+.mt-20{margin-top: 20px;}
+.mr-10{margin-right: 10px;}
+.ml-10{margin-left: 10px;}
+.mt-5{margin-top: 5px;}
+
+
+.ui-form{
+	margin-bottom: 10px;
+	.ui-label{
+		display: block;
+		color: #555;
+	}
+}
+
+.avatar{
+  height: 26px;
+  width: 26px;
+  background-color: #f8df72;
+  color: #1e1f21;
+  text-align: center;
+  border-radius: 50px;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+  margin-right: 5px;
+  position: relative;
+}
+.avatar span{
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: .8rem ;
+}
+
+</style>
