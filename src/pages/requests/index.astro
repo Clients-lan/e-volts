@@ -3,10 +3,13 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.vue'
 import RequestPage from '../../components/RequestPage.vue'
 
+const cookies = Astro.cookies.get('evolt-user')
+const path = Astro.request.url.split('/')[3]
+
 ---
 
-<Layout title="Requests">
-    <Navbar client:load />
-    <RequestPage client:load />
+<Layout title="E-volts Automobiles | Demander">
+    <Navbar path={path} user={cookies.value} client:idle />
+    <RequestPage client:idle />
 </Layout>
 

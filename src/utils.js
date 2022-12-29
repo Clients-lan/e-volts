@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 
 import { initializeApp } from "firebase/app";
@@ -53,19 +52,10 @@ function getCookie(name) {
     return null;
 }
 
-// @ts-ignore
-function eraseCookie(name) {   
-    document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-}
 
   // @ts-ignore
   const manageCookies = (email, genre) => {
-    if(genre == 'get'){
-      return getCookie('evolt-user')
-    }
-    if(genre == 'del'){
-      return eraseCookie('evolt-user')
-    }
+    if(genre == 'get') return getCookie('evolt-user')
   
     if(email === import.meta.env.PUBLIC_ADMIN_EMAIL){
       setCookie('evolt-user', 'admin')
@@ -95,44 +85,44 @@ function eraseCookie(name) {
 
   const sAttrs = {
     status: [
-      'Submitted', 'In progress', 'Pending response', 'On hold', 'Completed',
+      'Soumis', 'En cours', 'En attente', 'Complété',
     ],
-    urgency: ['Low', 'Medium', 'High'],
-    pay: ['Drafted', 'Processing', 'Paid', 'Confirmed'],
-    formAttr: {files: [], due: null, date: new Date().toDateString(), status: 'Submitted', pay: 'Drafted'},
+    urgency: ['Faible', 'Moyen', 'Haut'],
+    pay: ['Rédigé', 'Traitement', 'Payé', 'Confirmé'],
+    formAttr: {files: [], due: null, date: new Date().toLocaleDateString('fr-FR'), status: 'Soumis', pay: 'Rédigé'},
   }
 
 
   const reqColumns = [
+    { title: 'Req. #', dataIndex: 'orderid', responsive: ['sm'] },
     {
-      title: 'Name', dataIndex: 'name',
+      title: 'Modèle', dataIndex: 'name',
       sorter: (a, b) => a.name.length - b.name.length,
       sortDirections: ['descend', 'ascend'],
     },
     {
-       title: 'Status', dataIndex: 'status',
+       title: 'Statut', dataIndex: 'status',
        sorter: (a, b) => a.status.length - b.status.length,
      },
-    { title: 'Owner', dataIndex: 'client_id' },
-    { title: 'Created', dataIndex: 'date', responsive: ['sm'] },
+    { title: 'Immatricul.', dataIndex: 'plates' },
     { 
       title: 'Urgency', dataIndex: 'urgency',  responsive: ['sm'],
       sorter: (a, b) => a.urgency.length - b.urgency.length,
       filters: sAttrs.urgency.map(el => { return { text: el, value: el }}),
       onFilter: (value, record) => record.urgency.indexOf(value) === 0,
      },
-    { title: 'Location', dataIndex: 'location', width: '12%', responsive: ['sm'] },
+    { title: 'Établi', dataIndex: 'date', width: '12%', responsive: ['sm'] },
     { title: 'O', key: 'operation', dataIndex: '_id', width: '10px' },
   ];
 
   const cusColumns = [
-    { title: 'First Name', dataIndex: 'fname', responsive: ['sm'] },
-    { title: 'Last Name', dataIndex: 'lname', responsive: ['sm'] },
+    { title: 'Prénom', dataIndex: 'fname', responsive: ['sm'] },
+    { title: 'Nom de famille', dataIndex: 'lname', responsive: ['sm'] },
     {
-       title: 'Email', dataIndex: 'email',
+       title: 'E-mail', dataIndex: 'email',
        sorter: (a, b) => a.email.length - b.email.length,
      },
-    { title: 'Company', dataIndex: 'company' },
+    { title: 'Compagnie', dataIndex: 'company' },
     { title: 'Date', dataIndex: 'date', responsive: ['sm'] },
     { title: null, key: 'operation', dataIndex: '_id', width: '30px' },
   ]
@@ -149,7 +139,8 @@ function eraseCookie(name) {
 
 
   const loginErr = (err) => {
-    let msg = err.includes('wrong-password') ? 'Incorrent password' : err.includes('user-not-found') ? 'This email is not reqistered' : 'Temporary error! Please try again later'
+    let msg = err.includes('wrong-password') ? 'Incorrent password' : err.includes('user-not-found') ? 'This email is not reqistered' :
+    err.includes('email-already') ? 'That email address is already registered to a customer' : 'Temporary error! Please try again later'
     return msg
   }
  
@@ -157,7 +148,7 @@ function eraseCookie(name) {
     fetch(`/api/mailing`, {
       method: 'POST',
       body: JSON.stringify({
-        to: to || import.meta.env.PUBLIC_ADMIN_EMAI, 
+        to: to || import.meta.env.PUBLIC_ADMIN_EMAIL, 
         subject: sub, msg: msg
       })
     }).then(res => res.json())
@@ -171,7 +162,7 @@ function eraseCookie(name) {
   const delDocument = async (family, id) => {
     await deleteDoc(doc(db, family, id));
     message.success(`Item successfully deleted from ${family} `)
-    if(family == 'requests') return location.href = '/requests'
+    if(family == 'requests') return setTimeout(() => location.href = '/requests', 600);
   }
   
 
@@ -184,6 +175,12 @@ function eraseCookie(name) {
     return results
   }
 
+  const singleCustomerAutos = async (uid) => {
+    const q =  query(collection(db, 'requests'), where("client_id", "==", uid))
+    const querySnapshot = await getDocs(q);
+    return querySnapshot
+  }
+
   const truncate = (str, n) => (str.length > n) ? str.slice(0, n-1) + '...' : str;
 
 
@@ -191,5 +188,5 @@ function eraseCookie(name) {
     db, manageCookies, saveAttachment, auth,
     findCustomer, sAttrs, reqColumns, tagMaker,
     chat, cusColumns, loginErr, mailer, delDocument,
-    getDocuments, truncate, storage
+    getDocuments, truncate, storage, getCookie, singleCustomerAutos
   }

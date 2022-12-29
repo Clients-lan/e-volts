@@ -2,9 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.vue'
 import Account from '../components/AccountPage.vue'
+
+const cookies = Astro.cookies.get('evolt-user')
+const path = Astro.request.url.split('/')[3]
 ---
 
-<Layout title="Big brain">
-    <Navbar client:load />
-    <Account client:load />
+<Layout title="E-volts Automobiles | Compte">
+    <Navbar path={path} user={cookies.value} client:idle />
+    <Account client:idle />
 </Layout>

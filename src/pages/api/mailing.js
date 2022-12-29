@@ -6,7 +6,7 @@ export async function post({ request }) {
   const msg = {
     to: body.to, from: 'notifications@detektes.com', 
     subject: body.subject, text: 'Notification',
-    html: `${body.msg}`
+    html: `<div style="max-width:600px;">${body.msg}</div>`
   }
   try {
     await Sgmail.send(msg)

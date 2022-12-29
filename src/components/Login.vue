@@ -19,20 +19,21 @@
                 </div>
 
                 <a-button type="primary" htmlType="submit" class="mt-20" :loading="loading" size="large" block>Procéder</a-button>
-                <div class="cente mt-10">
-                    <a href="#reset" @click="visible = true">Mot de passe oublié?</a>
+                <div class="center mt-10">
+                    <a href="#reset" @click="visible = true">Vous voulez réinitialiser votre mot de passe ?</a>
                 </div>
 
             </form>
         </div>
 
-        <a-modal v-model:visible="visible" title="Reset your password" :onCancel="close" :footer="null">
+        <a-modal v-model:visible="visible" title="Réinitialisez votre mot de passe" :onCancel="close" :footer="null">
             <form @submit.prevent="reset">
-                <div class="ui-form">
-                    <label class="ui-label">Your email</label>
-                    <a-input v-model:value="resetForm" type="email" placeholder="Enter email address" required />
+                <p>Entrez l'e-mail associé à votre compte, et nous vous enverrons un e-mail avec des instructions pour réinitialiser votre mot de passe</p>
+                <div class="ui-form mt0">
+                    <label class="ui-label">Votre adresse e-mail</label>
+                    <a-input v-model:value="resetForm" type="email" placeholder="E-mail" required />
                 </div>
-                <a-button htmlType="submit" type="primary" :loading="loading" block>Request reset link</a-button>
+                <a-button htmlType="submit" class="mt-20" type="primary" :loading="loading" block>Obtenir le lien de réinitialisation</a-button>
             </form>
         </a-modal>
 

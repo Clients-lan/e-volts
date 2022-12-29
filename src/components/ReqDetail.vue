@@ -10,21 +10,27 @@
                 </div>
                 <div v-else class="grid grid-2 top-header">
                     <div>
-                        <h3>{{ request.name }} ({{ request.plates }})</h3>
+                        <h3>{{ request.brand }} {{ request.name }} ({{ request.plates }})</h3>
                         <p>{{ request.location }}</p>
                     </div>
                     <div class="align-r">
-                        <p>Created</p>
+                        <p>Établi</p>
                         <p>{{ request.date }}</p>
                     </div>
                 </div>
                 <div class="middle-header">
                   <a-skeleton v-if="loading" active :paragraph="{ rows: 4 }" :loading="loading" />
                   <div v-else>
-                    <p>{{ request.desc }}</p>
-                    <div  class="grid grid-3">
+                    <a-steps :current="prog.curr" size="small" class="ui-step">
+                     <a-step title="Soumis" :status="prog.a" />
+                     <a-step title="En cours" :status="prog.b" />
+                     <a-step title="Complété" :status="prog.c" />
+                  </a-steps>
+                  <p class="mt-20">{{ request.desc }}</p>
+
+                    <div  class="grid grid-3 mt-10">
                         <div class="ui-form">
-                            <label class="ui-lable">Owner</label>
+                            <label class="ui-lable">Propriétaire</label>
                             <p>{{ owner.fname }} {{ owner.lname }}</p>
                         </div>
                         <div class="ui-form">
@@ -36,11 +42,11 @@
                             </a-select>
                         </div>
                         <div class="ui-form">
-                         <label class="ui-label">Pick up date</label>
+                         <label class="ui-label">Date de ramassage</label>
                          <a-date-picker style="width: 100%" v-model:value="dueDate" format="YYYY/MM/DD" />
                       </div>
                       <div class="ui-form">
-                        <label class="ui-label">Payment status</label>
+                        <label class="ui-label">Statut de paiement</label>
                            <a-select class="ui-select" placeholder="Select" @select="watching(request.pay, 'pay')" style="width: 100%" v-model:value="request.pay" :bordered="false" required>
                             <a-select-option v-for="item in sAttrs.pay" :key="item" :value="item">
                            <a-tag :color="tagMaker(item)">{{ item }}</a-tag>
@@ -48,7 +54,7 @@
                          </a-select>
                         </div>
                         <div class="ui-form">
-                        <label class="ui-label">Service status</label>
+                        <label class="ui-label">État du service</label>
                             <a-select :disabled="admin != 'admin'" class="ui-select" @select="watching(request.status, 'service')" placeholder="Select" style="width: 100%" v-model:value="request.status" :bordered="false" required>
                               <a-select-option v-for="item in sAttrs.status" :key="item" :value="item">
                             <a-tag :color="tagMaker(item)">{{ item }}</a-tag>
@@ -56,7 +62,7 @@
                          </a-select>
                         </div>
                         <div class="ui-form">
-                        <label class="ui-label">Location</label>
+                        <label class="ui-label">Lieu de dépôt / prise en charge</label>
                          <a-select :disabled="admin != 'admin'" placeholder="Select" style="width: 100%" v-model:value="request.location" required>
                           <a-select-option v-for="(item, index) in locations" :key="index" :value="item.location">{{ truncate(item.location, 28) }}</a-select-option>
                          </a-select>
@@ -65,10 +71,10 @@
                     </div>
                 </div>
                 <div class="bottom-header">
-                  <a-popconfirm title="Are you sure delete this request?" ok-text="Yes" cancel-text="No" @confirm="delDocument('requests', request._id)">
-                    <a-button type="primary" danger>Delete request</a-button>
+                  <a-popconfirm title="Êtes-vous sûr de supprimer cette demande?" ok-text="Oui" cancel-text="Non" @confirm="delPermanent">
+                    <a-button type="primary" danger>Supprimer la demande</a-button>
                   </a-popconfirm>
-                    <a-button type="dashed" @click="saveChanges" class="ml-10">Save changes</a-button>
+                    <a-button type="dashed" @click="saveChanges" class="ml-10">Sauvegarder les modifications</a-button>
                 </div>
             </div>
 
@@ -82,7 +88,7 @@
                      <a-skeleton avatar active :paragraph="{ rows: 4 }" :loading="loading" />
 
                     <div class="chat-tab__main disqus-main">
-                      <div v-for="(item, index) in rtchat" :key="index" class="bubble" :class="[item.user == currentUser.uid ? 'chat-me' : 'chat-the']">
+                      <div v-for="(item, index) in rtchat" :key="index" class="bubble" :class="[item.family == 'customer' ? 'chat-me' : 'chat-them']">
                         <div class="flex user-tag">
                          <div class="avatar">
                             <span>{{ item.family == 'admin' ? 'E' : owner.fname.charAt(0).toUpperCase() }}</span>
@@ -100,15 +106,15 @@
                     </div>
                     <div class="chat-tab__inputs">
                      <form @submit.prevent="postChat">
-                        <a-textarea v-model:value="chat.msg" placeholder="Enter message or update" required></a-textarea>
+                        <a-textarea v-model:value="chat.msg" placeholder="Entrez un message ou mettez à jour" required></a-textarea>
                          <p class="mt-10" v-if="admin == 'admin'"><a-switch size="small" @change="watching(checked, 'post')" v-model:checked="checked"></a-switch>  <span class="inline">Notify {{ owner.fname }} about your new message</span></p>
                         <hr class="mt-10">
                         <div class="grid grid-2">
                             <a-upload :multiple="true" @change="handleChange">
-                                <a-button type="link">Add attachments</a-button>
+                                <a-button type="link">Ajouter des pièces jointes</a-button>
                             </a-upload>
                             <div>
-                                <a-button htmlType="submit" class="item-fr" size="large" :loading="wait" type="primary">Send</a-button>
+                                <a-button htmlType="submit" class="item-fr" size="large" :loading="wait" type="primary">Envoyer</a-button>
                             </div>
                         </div>
                       </form>
@@ -117,7 +123,7 @@
                 </a-tab-pane>
                 <a-tab-pane key="2">
                     <template #tab>
-                        <span> <FolderOutlined /> Files </span>
+                        <span> <FolderOutlined /> Des dossiers </span>
                     </template>
                      <div class="disqus-main discussion-files">
                         <File :files="fileList" />
@@ -131,13 +137,13 @@
 
 
 <script>
-import  { Tag, Button, Modal, Select, SelectOption, DatePicker, Input, Textarea, Upload, message, Tabs, TabPane, Switch, Skeleton, Popconfirm } from 'ant-design-vue';
+import  { Tag, Button, Select, SelectOption, DatePicker, Input, Textarea, Upload, message, Tabs, TabPane, Switch, Skeleton, Popconfirm, Steps, Step } from 'ant-design-vue';
 import { saveAttachment, db, auth, tagMaker, sAttrs, manageCookies, chat, getDocuments, mailer, truncate, delDocument } from '../utils'
 import { MessageOutlined, FolderOutlined, DownloadOutlined, DeleteOutlined, PaperClipOutlined } from '@ant-design/icons-vue'
 
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore"; 
-import { ref, set, onValue } from "firebase/database";
+import { ref, set, onValue, update } from "firebase/database";
 import { generate } from 'short-uuid'
 import dayjs from 'dayjs'
 
@@ -150,14 +156,14 @@ export default {
     components:{
         'a-button': Button, 'a-input': Input, 'a-select-option': SelectOption,
         'a-select': Select, 'a-textarea': Textarea, 'a-tabs': Tabs, 'a-popconfirm': Popconfirm,
-        'a-date-picker': DatePicker, 'a-tag': Tag, 'a-tab-pane': TabPane,
-        'a-switch': Switch, 'a-upload': Upload, 'a-skeleton': Skeleton,
+        'a-date-picker': DatePicker, 'a-tag': Tag, 'a-tab-pane': TabPane, 'a-steps': Steps,
+        'a-switch': Switch, 'a-upload': Upload, 'a-skeleton': Skeleton, 'a-step': Step,
         MessageOutlined, FolderOutlined, DownloadOutlined, DeleteOutlined,
         PaperClipOutlined, File
     },
     data: () => ({
         request: {files: []}, sAttrs, alerts: {},
-        form: {}, activeKey: '1', loading: true,
+        form: {}, activeKey: '1', loading: true, prog: {},
         currentUser: {}, checked: false, chat: {files: []},
         admin: null, rtchat: [], owner: {fname: ''}, watingUploads: [],
         fileList: [], dueDate: null, locations: [], wait: false
@@ -166,7 +172,10 @@ export default {
        async ready(family, id){
             let d = await getDocuments(id, family)
             family == 'requests' ? this.request = d[0] : this.owner = d[0]
-            if(family == 'requests') this.mountChat()
+            if(family == 'requests') {
+              this.mountChat()
+              this.progress()
+            }
         },
         handleChange(e){
             this.watingUploads = []
@@ -192,12 +201,12 @@ export default {
           this.ready('customers', this.request.client_id)
           this.locations = await getDocuments(null, 'locations', true)
           this.alerts = await getDocuments(null, 'alerts', true)
+          this.loading = false
 
           const starCountRef = ref(chat, 'posts/' + this.request._id);
             onValue(starCountRef, (snapshot) => {
             const data = snapshot.val();
 
-            this.loading = false
             this.fileList = this.request['files'].map(el => Object.assign(el, {origin: true}))
             this.dueDate = dayjs(this.request.due)
             emit.$emit('batch-one', this.fileList)
@@ -224,21 +233,38 @@ export default {
         async saveChanges(){
             this.request['due'] = dayjs(this.dueDate).format()
             await setDoc(doc(db, "requests", this.request._id),  this.request);
-            message.success('Changes updated successfully!')
+            message.success('Modifications mises à jour avec succès !')
         },
         watching(val, fam){
           if(fam == 'post'){
-            let msg  = `You have an new message from E-volts automobiles. Please <a href="${location.origin}/login">login into your account</a> to view the updates`
-            mailer(this.owner.email, 'Post updated', msg)
+            let msg  = `Bonjour ${this.owner.fname}, vous avez un nouveau message de E-volt Automobiles. Veuillez vous connecter avec cette URL`
+            mailer(this.owner.email, 'Post update', msg)
             return setTimeout(() => this.checked = false, 1000);
           }
-          let ald = ['Submitted', 'Confirmed', 'Completed', 'In progress'], al = this.alerts[0]
-          if(!ald.includes(val)) return
-          let msgTag = val == ald[0] ? al['alert_one'] : val == ald[1] ? al['alert_three'] : val == ald[2] ? al['alert_two'] : al['alert_four']
-          msgTag = msgTag.replaceAll('{username}', `${this.owner.fname} ${this.owner.lname}`)
+          let ald = [sAttrs.status[1], sAttrs.pay[3], sAttrs.status[4]], al = this.alerts[0]
+          if(ald.includes(val)){
+            let msgTag = val == ald[0] ? al['alert_four'] : val == ald[1] ? al['alert_three'] : al['alert_two'] 
+            msgTag = msgTag.replaceAll('{username}', `${this.owner.fname} ${this.owner.lname}`)
 
-          mailer(this.owner.email, `${fam} updates`, msgTag)
-          this.saveChanges()
+            mailer(this.owner.email, `${fam} mises à jour`, msgTag)
+            this.saveChanges()
+          }
+        },
+        progress(){
+          let req = this.request.status, attr = sAttrs.status;
+          let b = {curr: 1, a: 'finish', b: 'process', c: 'wait'}
+          this.prog = req == attr[0] ? {curr: 0, a: 'finish', b: 'wait', c: 'wait' } 
+          : req == attr[1] ? b: req == attr[4] ? {curr: 2, a: 'process', b : 'process', c: 'finish'} : {...b, ...{b: 'error'}}
+        },
+        delPermanent(){
+          const updates = {};
+          updates['/posts/' + this.request._id] = {};
+
+          update(ref(chat), updates);
+          setTimeout(() => {
+            delDocument('requests', this.request._id)
+            if(this.fileList.length > 0) emit.$emit('del-remotely', this.fileList) 
+          }, 500);
         },
         //@helpers
         tagMaker, truncate, delDocument
@@ -285,7 +311,7 @@ export default {
   border-radius: 10px;
 
   .grid{
-    grid-gap: 30px;
+    grid-gap: 20px;
     .ui-form{
         margin: 0px;
     }
@@ -306,6 +332,11 @@ export default {
   border-bottom: $border;
 }
 
+.ui-step{
+   background: #FBFCFC;
+   padding: 20px 10px;
+}
+
 .top-header, .middle-header, .bottom-header{
     padding: 20px;
 }
@@ -323,10 +354,7 @@ export default {
   min-height: 100px;
 }
 
-.chat-me .avatar{
-  background-color: #566573;
-  color: #fff;
-}
+
 
 .bubble span{
   font-size: .9rem;
@@ -357,12 +385,35 @@ export default {
   }
 }
 
+.avatar{
+  height: 26px;
+  width: 26px;
+  background-color: #f8df72;
+  color: #1e1f21;
+  text-align: center;
+  border-radius: 50px;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+  margin-right: 5px;
+  position: relative;
+}
+.avatar span{
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: .8rem ;
+}
+
+.chat-me .avatar{
+  background-color: #566573;
+  color: #fff;
+}
+
 
 @media (max-width:900px) {
-  .middle-header{
-    .grid{
-      grid-template-columns: 100% !important;
-    }
+  .middle-header .grid, .top-header{
+    grid-template-columns: 100% !important;
+    grid-gap: 15px !important;
   }
 }
 

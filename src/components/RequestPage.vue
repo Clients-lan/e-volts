@@ -3,11 +3,11 @@
         <div class="main-panel">
             <div class="table-actions flex space">
                 <div class="width-2">
-                    <a-input-search v-model:value="cerca" placeholder="Search..." style="width: 100%" @input="onSearch"/>
+                    <a-input-search v-model:value="cerca" placeholder="Chercher..." style="width: 100%" @input="onSearch"/>
                 </div>
                 <div class="width-2">
                     <div class="item-fr">
-                        <a-button type="primary" @click="visible = true">Créer une demande</a-button>
+                        <a-button type="primary" @click="newOrder">Créer une demande</a-button>
                     </div>
                 </div>
             </div>
@@ -36,58 +36,62 @@
             </a-table>
         </div>
 
-
         <!-- Modal for request creation -->
         <a-modal v-model:visible="visible" title="Créer une nouvelle demande">
             <template #footer>
-                <a-button key="back" @click="visible = false">Cancel</a-button>
+                <a-button key="back" @click="visible = false">Annuler</a-button>
                 <a-button key="submit" type="primary" :loading="loadBtn" @click="handleOk">Submit</a-button>
             </template>
 
             <form @submit.prevent="createRequest">
                 <div class="grid grid-2">
                     <div class="ui-form">
-                        <label class="ui-label">Service name</label>
-                        <a-input v-model:value="form.name" placeholder="Enter title" required />
+                        <label class="ui-label">Modèle</label>
+                        <a-input v-model:value="form.name" placeholder="Modèle de voiture" required />
                     </div>
                     <div class="ui-form">
-                        <label class="ui-label">Location</label>
-                        <a-select placeholder="Select" style="width: 100%" v-model:value="form.location" required>
+                        <label class="ui-label">Point de chute</label>
+                        <a-select placeholder="Sélectionner" style="width: 100%" v-model:value="form.location" required>
                           <a-select-option v-for="(item, index) in locations" :key="index" :value="item.location">{{ truncate(item.location, 28) }}</a-select-option>
                         </a-select>
                     </div>
                     <div class="ui-form">
                         <label class="ui-label">Urgency</label>
-                        <a-select placeholder="Urgency" style="width: 100%" v-model:value="form.urgency" required>
+                        <a-select placeholder="Sélectionner" style="width: 100%" v-model:value="form.urgency" required>
                           <a-select-option v-for="item in sAttrs.urgency" :key="item" :value="item">{{ item }}</a-select-option>
                         </a-select>
                     </div>
                     <div v-if="admin != 'admin'" class="ui-form">
-                        <label class="ui-label">Pick up date</label>
-                        <a-date-picker style="width: 100%" v-model:value="dueDate" />
+                        <label class="ui-label">Date de ramassage</label>
+                        <a-date-picker style="width: 100%" placeholder="Choisis une date" v-model:value="dueDate" />
                     </div>
                     <div v-else class="ui-form">
-                        <label class="ui-label">Customer</label>
+                        <label class="ui-label">Client</label>
                         <a-select placeholder="Select" style="width: 100%" v-model:value="form.client_id" required>
                           <a-select-option v-for="item in customers" :key="item._id" :value="item._id">{{ item.fname }} {{ item.lname }}</a-select-option>
                         </a-select>
                     </div>
+                    <div class="ui-form">
+                     <label class="ui-label">Immatriculation</label>
+                     <a-input v-model:value="form.plates" placeholder="Entrez le numéro d'immatriculation" required />
+                    </div>
+                    <div class="ui-form">
+                     <label class="ui-label">Marque</label>
+                     <a-input v-model:value="form.brand" placeholder="Entrez la marque" required />
+                    </div>
                 </div>
-                <div class="ui-form mt-10">
-                    <label class="ui-label">Vehicle plate number(s)</label>
-                    <a-input v-model:value="form.plates" placeholder="Eg. 39393, 39393" required />
-                </div>
+
                 <div class="ui-form mt-20">
-                    <label class="ui-label">Description</label>
-                    <a-textarea v-model:value="form.desc" placeholder="Describe service or issues" :rows="4" required />
+                    <label class="ui-label">Remarque/Description</label>
+                    <a-textarea v-model:value="form.desc" placeholder="Décrivez le service ou les problèmes" :rows="4" required />
                 </div>
                 <div class="ui-form">
                     <a-upload-dragger name="file" :multiple="true" @change="attachFiles">
                     <p class="ant-upload-drag-icon">
                        <CloudUploadOutlined />
                     </p>
-                    <p class="ant-upload-text">Documents & photos</p>
-                    <p class="ant-upload-hint">Click or drag file to this area to upload</p>
+                    <p class="ant-upload-text">Documents et photographies</p>
+                    <p class="ant-upload-hint">Cliquez ou faites glisser le fichier dans cette zone pour le télécharger</p>
                     </a-upload-dragger>
                 </div>
                 <a-button htmlType="submit" id="create-req"></a-button>
@@ -114,7 +118,7 @@ export default {
         'a-table': Table, 'a-tag': Tag, 'a-button': Button, 'a-input-search': InputSearch,
         'a-modal': Modal, 'a-select': Select, 'a-select-option': SelectOption, 
         'a-upload-dragger': UploadDragger, 'a-date-picker': DatePicker, 'a-input': Input,
-        'a-textarea': Textarea
+        'a-textarea': Textarea, 
     },
     data: () => ({
         loading: false, columns: reqColumns, requests: [], customers: [],
@@ -136,22 +140,26 @@ export default {
             Promise.all([...e.fileList].map(el => this.watingUploads.push(el.originFileObj)))
         },
         async createRequestExtended(){
-            this.form['_id'] = generate()
-            this.form['due'] = dayjs(this.dueDate || new Date()).format()
-            await setDoc(doc(db, "requests", this.form._id),  this.form);
+            let owner = this.customers.filter(a => a._id == this.form.client_id)[0]
+            if(!owner) return message.error(`Ce client n'existe pas`)
 
+            this.form = {...this.form, ...{_id: generate(), due: dayjs(this.dueDate || new Date()).format(), orderid: Math.floor(Math.random()*90000) + 10000}}
+            await setDoc(doc(db, "requests", this.form._id),  this.form);
             //@reset attrs
-            this.form = sAttrs.formAttr
             this.loadBtn = false
             this.visible = false
+
+            let msg = `Bonjour ${owner.fname} ${owner.lname} <br><br> La demande à bien été pris en compte 👍 <br> Je vous contacterai si besoin d'info supplémentaire. <br> 🙂 Merci`
+            this.form = {}
             if(this.admin == 'customer'){
-              let msg = `Hi E-volts, you have a new requests from  one of your customers`
-              mailer(null, 'Service request', msg)
+              let msg1 = `Hi E-volts Automobiles, you have a new requests from  one of your customers`
+              return mailer(null, 'Service request', msg1)
             }
+            mailer(owner.email, 'Demande créée', msg)
         },
         handleOk(){
             if(!this.form.client_id || !this.form.location || !this.form.urgency){
-                return message.warning('Please fill in all the required files')
+                return message.warning('Veuillez remplir tous les champs obligatoires')
             }
             document.querySelector('#create-req').click()
         },
@@ -177,6 +185,21 @@ export default {
             if(this.watingUploads.length > 0) return this.handleUpload()
             this.createRequestExtended()
         },
+        newOrder(){
+           if(this.locations.length == 0){
+                this.queryListener('locations')
+            }
+            this.form = sAttrs.formAttr
+            this.visible = true
+        },
+        queryListener(q){
+          onSnapshot(query(collection(db, q)), (querySnapshot) => {   
+                let data = [] 
+                querySnapshot.forEach((doc) => data.push(doc.data()));
+                q == 'requests' ? this.requests = data : 
+                q == 'locations' ? this.locations = data : this.customers = data
+            })
+        },
         //@ helpers
         tagMaker, findCustomer, truncate
     },
@@ -187,24 +210,15 @@ export default {
                 this.currentUser = user
                 this.admin = manageCookies(user.email, 'get')
                 this.form['client_id'] = this.admin == 'admin' ? null : user.uid
-                queryListener('locations')
 
                 if(this.admin == 'customer') return this.customerOnly()
-                queryListener('customers')
-                queryListener('requests')
+                if(this.columns.length == 7){
+                   this.columns.splice(4, 0, { title: 'Propriétaire', dataIndex: 'client_id', responsive: ['sm'] })
+                   this.columns.join()
+                }
+                this.queryListener('customers')
+                this.queryListener('requests')
             })
-
-         
-         const queryListener = (q) => {
-            const qCustomers = query(collection(db, q))
-
-            onSnapshot(qCustomers, (querySnapshot) => {   
-                let data = [] 
-                querySnapshot.forEach((doc) => data.push(doc.data()));
-                q == 'requests' ? this.requests = data : 
-                q == 'locations' ? this.locations = data : this.customers = data
-            })
-         }
      }
  
 }

@@ -1,16 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.vue'
+import Home from '../components/Home.vue'
+const cookies = Astro.cookies.get('evolt-user')
+const path = Astro.request.url.split('/')[3]
 
 ---
 
-
-<Layout title="Evolts Automobiles">
-	<div class="main-panel">
-	  <div class="center">
-		<h1>Comining soon</h1>
-		
-	  </div>
-	</div>
+<Layout title="E-volts Automobiles | Aperçu">
+    <Navbar path={path} user={cookies.value} client:idle />
+    <Home client:idle />
 </Layout>
+
 
 	

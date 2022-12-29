@@ -9,7 +9,7 @@
         <div v-else class="main-panel">
             <div class="admin-only" v-if="account == 'admin'">
               <form @submit.prevent="addPlace" class="account-tab">
-                 <div class="top"><h3>Drop-off / pick-up locations</h3></div>
+                 <div class="top"><h3>Lieux de dépôt/prise en charge</h3></div>
                   <div class="main-content">
                     <a-input-group compact>
                         <a-input v-model:value="form.location" placeholder="Enter location address" style="width: calc(100% - 110px)" required />
@@ -21,79 +21,79 @@
                           <a-list-item>
                             {{ item.location }}
                              <template #actions>
-                              <a key="list-loadmore-edit" @click="edit(item)">edit</a>
-                              <a key="list-loadmore-more" @click="delDocument('locations', item._id)">Remove</a>
+                              <a key="list-loadmore-edit" @click="edit(item)">Éditer</a>
+                              <a key="list-loadmore-more" @click="delDocument('locations', item._id)">Supprimer</a>
                             </template>
                           </a-list-item>
                         </template>
-                        <template #header><div>All locations</div></template>
+                        <template #header><div>Tous les emplacements</div></template>
                       </a-list>
                     </div>
                   </form>
                 <div class="account-tab">
-                 <div class="top"><h3>Alert messages</h3></div>
-                  <form @submit.prevent="addAlerts" class="main-content">
-                    <p>Specify what email message is sent to your client when a request or payment status change </p>
-
+                 <div class="top"><h3>Messages d'alerte</h3></div>
+                  <form @submit.prevent="addAlerts" class="main-content admin-form">
+                    <p>Spécifiez quel message électronique est envoyé à votre client lorsqu'une demande ou un changement de statut de paiement</p>
+<!-- 
                       <div class="ui-form">
                         <label class="ui-label">When a request is created</label>
-                        <a-textarea v-model:value="messages.alert_one" placeholder="Enter message" required></a-textarea>
+                        <a-textarea v-model:value="messages.alert_one" placeholder="Enter message" :auto-size="{ minRows: 2, maxRows: 5 }" required></a-textarea>
+                      </div> -->
+
+                      <div class="ui-form">
+                        <label class="ui-label">Lorsque l'entretien est terminé</label>
+                        <a-textarea v-model:value="messages.alert_two" placeholder="Enter message" :auto-size="{ minRows: 3, maxRows: 6 }" required></a-textarea>
                       </div>
 
                       <div class="ui-form">
-                        <label class="ui-label">When a request is completed</label>
-                        <a-textarea v-model:value="messages.alert_two" placeholder="Enter message" required></a-textarea>
+                        <label class="ui-label">Lorsqu'un paiement est confirmé</label>
+                        <a-textarea v-model:value="messages.alert_three" placeholder="Enter message" :auto-size="{ minRows: 3, maxRows: 6 }" required></a-textarea>
                       </div>
 
                       <div class="ui-form">
-                        <label class="ui-label">When a payment is confirmed</label>
-                        <a-textarea v-model:value="messages.alert_three" placeholder="Enter message" required></a-textarea>
-                      </div>
-
-                      <div class="ui-form">
-                        <label class="ui-label">When a request is in progress</label>
-                        <a-textarea v-model:value="messages.alert_four" placeholder="Enter message" required></a-textarea>
+                        <label class="ui-label">Lorsque la maintenance est en cours</label>
+                        <a-textarea v-model:value="messages.alert_four" placeholder="Enter message" :auto-size="{ minRows: 3, maxRows: 6 }" required></a-textarea>
                       </div>
 
                       <a-alert message="Type {username} to automatically insert the customer's full name. For example, 'Hi {username}...''" type="info" show-icon>
                         <template #icon><smile-outlined /></template>
                       </a-alert>
 
-                       <a-button type="primary" class="mt-20" htmlType="submit" shape="round" block>Save alert message</a-button>
+                       <a-button type="primary" class="mt-20" htmlType="submit" shape="round" block>Sauvegarder les modifications</a-button>
                     </form>
                 </div>
             </div>
             <div v-else class="customer-only">
                 <div class="account-tab">
-                <div class="top"><h3>Account</h3></div>
+                <div class="top"><h3>Paramètre du compte</h3></div>
                 <form @submit.prevent="updateAccount" class="main-content">
                     <div class="grid grid-2">
                       <div class="ui-form">
-                        <label class="ui-label">First name</label>
+                        <label class="ui-label">Prénom</label>
                         <a-input v-model:value="profile.fname"></a-input>
                        </div>
                        <div class="ui-form">
-                        <label class="ui-label">Last name</label>
+                        <label class="ui-label">Nom de famille</label>
                         <a-input v-model:value="profile.lname"></a-input>
                        </div>
                     </div>
                     <div class="ui-form">
-                      <label class="ui-label">Email address</label>
+                      <label class="ui-label">Adresse e-mail</label>
                       <a-input v-model:value="profile.email"></a-input>
                     </div>
                     <div class="ui-form">
-                      <label class="ui-label">Company</label>
+                      <label class="ui-label">Compagnie</label>
                       <a-input v-model:value="profile.company"></a-input>
                     </div>
-                    <a-button type="primary" shape="round" block>Save changes</a-button>
+                    <a-button type="primary" shape="round" block>Sauvegarder les modifications</a-button>
                 </form>
               </div>
 
                <div class="account-tab">
-                <div class="top"><h3>Reset password</h3></div>
+                <div class="top"><h3>Réinitialiser le mot de passe</h3></div>
                  <div class="main-content">
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis, dolorem.</p>
-                    <a-button type="default" shape="round" @click="reset" block>Continue</a-button>
+                    <p>Vous voulez réinitialiser votre mot de passe? Cliquez sur le bouton ci-dessous pour initialiser le processus.</p>
+                    <a-button type="dashed" shape="round" @click="reset" block>Continuer</a-button>
                     </div>
                 </div>
             </div>
@@ -213,5 +213,11 @@ export default {
     .main-content{
         padding: 20px;
     }
+    p{
+      color: #777;
+   }
+   .ui-form{
+    margin-bottom: 25px;
+   }
 }
 </style>

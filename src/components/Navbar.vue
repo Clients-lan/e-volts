@@ -7,10 +7,10 @@
                     <div class="logo"><img src="../assets/logo.svg" alt="logo"></div>
                 </div>
                 <div class="nav-links flex">
-                        <a href="/home" :class="[path == '/home' ? 'active' : '']"><home-outlined /> <span class="nav-text">Analytique</span></a>
-                        <a href="/requests" :class="[path.startsWith('/requests') ? 'active' : '']"><car-outlined /> <span class="nav-text">Demandes</span> </a>
-                        <a v-if="user == 'admin'" href="/customers" :class="[path == '/customers' ? 'active' : '']"><team-outlined /> <span class="nav-text">Les clients</span></a>
-                        <a href="/account" :class="[path == '/account' ? 'active' : '']"><setting-outlined /> <span class="nav-text">Réglages</span></a>
+                        <a href="/home" :class="[path == 'home' ? 'active' : '']"><dashboard-outlined /> <span class="nav-text">Aperçu</span></a>
+                        <a href="/requests" :class="[pathAlt.startsWith('requests') ? 'active' : '']"><tag-outlined /> <span class="nav-text">Demandes</span> </a>
+                        <a v-if="user == 'admin'" href="/customers" :class="[path == 'customers' ? 'active' : '']"><team-outlined /> <span class="nav-text">Clients</span></a>
+                        <a href="/account" :class="[path == 'account' ? 'active' : '']"><setting-outlined /> <span class="nav-text">Réglages</span></a>
                     </div>
                 <div class="right-nav">
                     <a-dropdown-button :trigger="['click']"> Log out
@@ -28,29 +28,29 @@
 
 <script>
 import { Button, MenuItem, Menu, DropdownButton } from 'ant-design-vue'
-import { HomeOutlined, LogoutOutlined, SettingOutlined, TeamOutlined, CarOutlined } from '@ant-design/icons-vue'
+import { LogoutOutlined, SettingOutlined, TeamOutlined, CarOutlined, DashboardOutlined, TagOutlined } from '@ant-design/icons-vue'
 import { signOut } from "firebase/auth";
-import { auth, manageCookies } from '../utils'
+import { auth } from '../utils'
 
 export default {
+    props: ['user', 'path'],
     components:{
-        'a-button': Button, 'home-outlined': HomeOutlined, LogoutOutlined,
+        'a-button': Button, 'dashboard-outlined': DashboardOutlined, LogoutOutlined,
         'a-dropdown-button': DropdownButton,  'a-menu': Menu,
         'a-menu-item': MenuItem, 'team-outlined': TeamOutlined,
-        'setting-outlined': SettingOutlined, 'car-outlined': CarOutlined
+        'setting-outlined': SettingOutlined, 'tag-outlined': TagOutlined
     },
     data: () => ({
-        path:  '', user: null
+        pathAlt: ''
     }),
     methods:{
         handleMenuClick(){
             signOut(auth)
         }
     },
-    mounted(){
-        this.path = location.pathname
-        this.user = manageCookies(null, 'get')
-    }
+    created(){
+        this.pathAlt = this.path
+    },
 }
 </script>
 
@@ -62,7 +62,7 @@ nav{
     top: 0; 
     width: 100%;
     z-index: 8;
-    background: #f4f5f7;;
+    background: #f4f5f7;
     padding: 10px 10px 0 10px;
     .nav-wrapper{
         box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);

@@ -11,7 +11,7 @@
                 <a-button type="dashed" size="small" @click="open(item.url)" shape="circle">
                     <template #icon><DownloadOutlined /></template>
                 </a-button>
-                <a-popconfirm title="Are you sure delete this file?" ok-text="Yes" cancel-text="No" @confirm="delFile(item)">
+                <a-popconfirm title="Voulez-vous vraiment supprimer ce fichier?" ok-text="Oui" cancel-text="Non" @confirm="delFile(item)">
                  <a-button type="dashed"  class="ml-10" size="small" shape="circle">
                     <template #icon><DeleteOutlined /></template>
                  </a-button>
@@ -49,6 +49,18 @@ export default {
             })
         },
     },
+    mounted(){
+        emit.$on('del-remotely', (data) => {
+         data.forEach(item => {
+            const desertRef = ref(storage, `attachments/${item.name}`);
+            deleteObject(desertRef).then(() => {
+                message.success('Deleting files...')
+            }).catch((error) => {
+                message.error(`Something is not right ${error}`)
+             })
+           })
+        })
+    }
 }
 </script>
 
