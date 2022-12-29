@@ -254,7 +254,7 @@ export default {
           let req = this.request.status, attr = sAttrs.status;
           let b = {curr: 1, a: 'finish', b: 'process', c: 'wait'}
           this.prog = req == attr[0] ? {curr: 0, a: 'finish', b: 'wait', c: 'wait' } 
-          : req == attr[1] ? b: req == attr[4] ? {curr: 2, a: 'process', b : 'process', c: 'finish'} : {...b, ...{b: 'error'}}
+          : req == attr[1] ? b: req == attr[3] ? {curr: 2, a: 'process', b : 'process', c: 'finish'} : {...b, ...{b: 'error'}}
         },
         delPermanent(){
           const updates = {};
