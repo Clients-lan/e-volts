@@ -130,7 +130,7 @@ function getCookie(name) {
   const tagMaker = (w) => {
     let gray  = [sAttrs.pay[0], sAttrs.status[0], sAttrs.urgency[0]]
     let blue = [sAttrs.urgency[1], sAttrs.pay[1], sAttrs.status[1]]
-    let orange = [sAttrs.status[2], sAttrs.status[3]]
+    let orange = [sAttrs.status[2]]
     let red = [sAttrs.urgency[2]]
 
     return gray.includes(w) ? 'default' : blue.includes(w) ? 'blue' :
