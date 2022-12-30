@@ -78,7 +78,7 @@
                   <a-popconfirm title="Êtes-vous sûr de supprimer cette demande?" ok-text="Oui" cancel-text="Non" @confirm="delPermanent">
                     <a-button type="primary" danger>Supprimer la demande</a-button>
                   </a-popconfirm>
-                    <a-button type="dashed" @click="saveChanges" class="ml-10">Sauvegarder les modifications</a-button>
+                    <a-button type="dashed" @click="saveChanges" class="ml-10 save-button">Sauvegarder les modifications</a-button>
                 </div>
             </div>
 
@@ -419,6 +419,12 @@ export default {
   .middle-header .grid, .top-header{
     grid-template-columns: 100% !important;
     grid-gap: 15px !important;
+  }
+  .bottom-header{
+    .save-button{
+      margin-top: 20px;
+      margin-left: -1px;
+    }
   }
 }
 
