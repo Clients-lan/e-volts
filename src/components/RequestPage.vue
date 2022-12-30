@@ -12,15 +12,29 @@
                 </div>
             </div>
             <a-table :columns="columns" :data-source="requests" :pagination="{ pageSize: 10 }" :loading="loading">
+                <template #headerCell="{ column }">
+                 <template v-if="column.dataIndex === 'plates'">
+                    <span>
+                     {{ column.title }} 
+                     <a-tooltip>
+                        <template #title>Hé! Cliquez sur le numéro d'immatriculation de la voiture de toute demande et voyez ce qui se passe</template>
+                        <InfoCircleOutlined />
+                    </a-tooltip>
+                    </span>
+                 </template>
+                </template>
                 <template #bodyCell="{ column, text }">
                     <template v-if="column.dataIndex === 'status'">
-                        <a-tag :color="tagMaker(text)">{{ text }}</a-tag>
+                        <a-tag  :color="tagMaker(text)">{{ text }}</a-tag>
                     </template>
                     <template v-if="column.dataIndex === 'client_id'">
                         {{ findCustomer(text, customers) }}
                     </template>
                     <template v-if="column.dataIndex === 'location'">
                         {{ truncate(text, 10) }}
+                    </template>
+                    <template v-if="column.dataIndex === 'plates'">
+                        <span style="cursor: pointer;" @click="showDesc(text)">{{ text }}</span>
                     </template>
                     <template v-if="column.dataIndex === 'urgency'">
                         <a-tag :color="tagMaker(text)">{{ text }}</a-tag>
@@ -105,20 +119,20 @@
 import { doc, setDoc, getDocs, onSnapshot, collection, query, where } from "firebase/firestore"; 
 import {  onAuthStateChanged } from "firebase/auth";
 
-import  { Table, Tag, Button, InputSearch, Modal, Select, SelectOption, DatePicker, Input, Textarea, UploadDragger, message } from 'ant-design-vue';
-import {  reqColumns, saveAttachment, db, auth, tagMaker, findCustomer, sAttrs, manageCookies, getDocuments, truncate, mailer } from '../utils'
-import { ArrowRightOutlined, CloudUploadOutlined } from '@ant-design/icons-vue'
+import  { Table, Tag, Button, InputSearch, Modal, Select, SelectOption, DatePicker, Input, Textarea, UploadDragger, notification, Tooltip, message } from 'ant-design-vue';
+import {  reqColumns, saveAttachment, db, auth, tagMaker, findCustomer, sAttrs, manageCookies, getDocuments, truncate, mailer, sea } from '../utils'
+import { ArrowRightOutlined, CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 import { generate } from 'short-uuid'
 import dayjs from 'dayjs'
 
 
 export default {
     components:{
-        ArrowRightOutlined, CloudUploadOutlined,
+        ArrowRightOutlined, CloudUploadOutlined, InfoCircleOutlined,
         'a-table': Table, 'a-tag': Tag, 'a-button': Button, 'a-input-search': InputSearch,
         'a-modal': Modal, 'a-select': Select, 'a-select-option': SelectOption, 
         'a-upload-dragger': UploadDragger, 'a-date-picker': DatePicker, 'a-input': Input,
-        'a-textarea': Textarea, 
+        'a-textarea': Textarea, 'a-tooltip': Tooltip
     },
     data: () => ({
         loading: false, columns: reqColumns, requests: [], customers: [],
@@ -164,9 +178,9 @@ export default {
             document.querySelector('#create-req').click()
         },
         onSearch(s){
-            let sh = s.target.value || s
+            let sh = s.target.value.trim()
             if(typeof sh !== 'string') return this.requests = this.store
-            this.requests = this.store.filter(i => i.name.toLowerCase().match(sh.toLowerCase()))
+            this.requests = this.store.filter(i => sea(i.name, sh) || sea(i.plates, sh) || sea(i.orderid.toString(), sh))
         },
         async customerOnly(){
             const q = query(collection(db, 'requests'), where("client_id", "==", this.form.client_id))
@@ -196,9 +210,14 @@ export default {
           onSnapshot(query(collection(db, q)), (querySnapshot) => {   
                 let data = [] 
                 querySnapshot.forEach((doc) => data.push(doc.data()));
-                q == 'requests' ? this.requests = data : 
-                q == 'locations' ? this.locations = data : this.customers = data
+                q == 'requests' ? this.requests = data : q == 'locations' ? this.locations = data : this.customers = data
+                if(q == 'requests') this.store = data
             })
+        },
+        showDesc(plate){
+            let desc = this.requests.filter(a =>  a.plates == plate)
+            if(desc.length == 0) return
+            notification['info']({ message: `Demande de note (${desc[0].plates})`, description: desc[0].desc })
         },
         //@ helpers
         tagMaker, findCustomer, truncate

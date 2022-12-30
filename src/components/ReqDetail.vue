@@ -26,9 +26,13 @@
                      <a-step title="En cours" :status="prog.b" />
                      <a-step title="Complété" :status="prog.c" />
                   </a-steps>
-                  <p class="mt-20">{{ request.desc }}</p>
 
-                    <div  class="grid grid-3 mt-10">
+                  <div class="ui-form mt-20">
+                    <label class="ui-form">Remarque/Description</label>
+                    <p class="desc-text">{{ request.desc }}</p>
+                  </div>
+
+                    <div  class="grid grid-3 mt-20">
                         <div class="ui-form">
                             <label class="ui-lable">Propriétaire</label>
                             <p>{{ owner.fname }} {{ owner.lname }}</p>
@@ -354,6 +358,7 @@ export default {
   min-height: 100px;
 }
 
+.desc-text{color: #666;}
 
 
 .bubble span{

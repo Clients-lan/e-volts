@@ -182,10 +182,11 @@ function getCookie(name) {
   }
 
   const truncate = (str, n) => (str.length > n) ? str.slice(0, n-1) + '...' : str;
+  const sea = (i, sh) => i.toLowerCase().match(sh.toLowerCase())
 
 
   export {
-    db, manageCookies, saveAttachment, auth,
+    db, manageCookies, saveAttachment, auth, sea,
     findCustomer, sAttrs, reqColumns, tagMaker,
     chat, cusColumns, loginErr, mailer, delDocument,
     getDocuments, truncate, storage, getCookie, singleCustomerAutos
