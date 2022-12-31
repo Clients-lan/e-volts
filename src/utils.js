@@ -10,13 +10,13 @@ import { message } from 'ant-design-vue'
 
 const firebaseConfig = {
     apiKey: import.meta.env.PUBLIC_FIREBASE_KEY,
-    authDomain: "lab-ch3.firebaseapp.com",
-    databaseURL: "https://lab-ch3-default-rtdb.firebaseio.com",
-    projectId: "lab-ch3",
-    storageBucket: "lab-ch3.appspot.com",
-    messagingSenderId: "137355579041",
-    appId: "1:137355579041:web:dbe91097d8e860fc1d2ae0",
-    measurementId: "G-QZV2F0M5FG"
+    authDomain: "e-volts-automobiles.firebaseapp.com",
+    databaseURL: "https://e-volts-automobiles-default-rtdb.firebaseio.com",
+    projectId: "e-volts-automobiles",
+    storageBucket: "e-volts-automobiles.appspot.com",
+    messagingSenderId: "10655588358",
+    appId: "1:10655588358:web:c1cc2eef3ed83eddbe6387",
+    measurementId: "G-M5H46CDJG4"
   };
 
 
