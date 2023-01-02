@@ -62,7 +62,7 @@ export default {
         login(){
             this.loading = true
             signInWithEmailAndPassword(auth, this.form.email, this.form.password).then(userCredential => {
-                manageCookies(userCredential.user, 'set')
+                manageCookies(userCredential.user.email, 'set')
                 setTimeout(() => location.href = '/requests', 500);
             }).catch((error) => {
                 const err = loginErr(error.message)
