@@ -73,7 +73,7 @@ export default {
         },
         prepStats(){
             this.stats['a'] = this.requests.filter(a => a.status == sAttrs.status[1]).length
-            this.stats['b'] = this.requests.filter(a => a.status == sAttrs.status[4]).length
+            this.stats['b'] = this.requests.filter(a => a.status == sAttrs.status[3]).length
             this.stats['c'] = this.requests.filter(a => a.urgency == sAttrs.urgency[2]).length
             this.loading = false
         },
