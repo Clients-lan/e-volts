@@ -142,7 +142,7 @@
 
 <script>
 import  { Tag, Button, Select, SelectOption, DatePicker, Input, Textarea, Upload, message, Tabs, TabPane, Switch, Skeleton, Popconfirm, Steps, Step } from 'ant-design-vue';
-import { saveAttachment, db, auth, tagMaker, sAttrs, manageCookies, chat, getDocuments, mailer, truncate, delDocument } from '../utils'
+import { saveAttachment, db, auth, tagMaker, sAttrs, manageCookies, chat, getDocuments, mailer, truncate, delDocument, mailConstructor } from '../utils'
 import { MessageOutlined, FolderOutlined, DownloadOutlined, DeleteOutlined, PaperClipOutlined } from '@ant-design/icons-vue'
 
 import { onAuthStateChanged } from "firebase/auth";
@@ -245,12 +245,11 @@ export default {
             mailer(this.owner.email, 'Post update', msg)
             return setTimeout(() => this.checked = false, 1000);
           }
-          let ald = [sAttrs.status[1], sAttrs.pay[3], sAttrs.status[4]], al = this.alerts[0]
+          let ald = [sAttrs.status[1], sAttrs.pay[3], sAttrs.status[3]], al = this.alerts[0]
           if(ald.includes(val)){
             let msgTag = val == ald[0] ? al['alert_four'] : val == ald[1] ? al['alert_three'] : al['alert_two'] 
-            msgTag = msgTag.replaceAll('{username}', `${this.owner.fname} ${this.owner.lname}`)
-
-            mailer(this.owner.email, `${fam} mises à jour`, msgTag)
+            let nMsg = mailConstructor(this.owner, this.request, msgTag)
+            mailer(this.owner.email, `${fam} mises à jour`, nMsg)
             this.saveChanges()
           }
         },

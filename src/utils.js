@@ -55,7 +55,11 @@ function getCookie(name) {
 
   // @ts-ignore
   const manageCookies = (email, genre) => {
-    if(genre == 'get') return getCookie('evolt-user')
+    if(genre == 'get'){
+      let cookie = getCookie('evolt-user')
+      if(cookie == null || !cookie) return location.href = '/login'
+      return cookie
+    }
   
     if(email === import.meta.env.PUBLIC_ADMIN_EMAIL){
       setCookie('evolt-user', 'admin')
@@ -181,6 +185,22 @@ function getCookie(name) {
     return querySnapshot
   }
 
+
+  const mailConstructor = (owner, req, msg) => {
+    msg = msg.replaceAll('{username}', `${owner.fname} ${owner.lname}`)
+    msg = msg.replaceAll('{RID}', req.orderid)
+    msg = msg.replaceAll('{marque}', req.brand)
+    msg = msg.replaceAll('{modele}', req.name)
+    msg = msg.replaceAll('{CRN}', req.plates)
+    console.log(req, msg);
+
+   //Request ID: {RID}
+   //brand: {marque}
+   //model: {modele}
+   //license plate: {CRN}
+   return msg
+  }
+
   const truncate = (str, n) => (str.length > n) ? str.slice(0, n-1) + '...' : str;
   const sea = (i, sh) => i.toLowerCase().match(sh.toLowerCase())
 
@@ -189,5 +209,6 @@ function getCookie(name) {
     db, manageCookies, saveAttachment, auth, sea,
     findCustomer, sAttrs, reqColumns, tagMaker,
     chat, cusColumns, loginErr, mailer, delDocument,
-    getDocuments, truncate, storage, getCookie, singleCustomerAutos
+    getDocuments, truncate, storage, getCookie, singleCustomerAutos,
+    mailConstructor
   }

@@ -120,7 +120,7 @@ import { doc, setDoc, getDocs, onSnapshot, collection, query, where } from "fire
 import {  onAuthStateChanged } from "firebase/auth";
 
 import  { Table, Tag, Button, InputSearch, Modal, Select, SelectOption, DatePicker, Input, Textarea, UploadDragger, notification, Tooltip, message } from 'ant-design-vue';
-import {  reqColumns, saveAttachment, db, auth, tagMaker, findCustomer, sAttrs, manageCookies, getDocuments, truncate, mailer, sea } from '../utils'
+import {  reqColumns, saveAttachment, db, auth, tagMaker, findCustomer, sAttrs, manageCookies, getDocuments, truncate, mailer, sea, mailConstructor } from '../utils'
 import { ArrowRightOutlined, CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 import { generate } from 'short-uuid'
 import dayjs from 'dayjs'
@@ -154,22 +154,22 @@ export default {
             Promise.all([...e.fileList].map(el => this.watingUploads.push(el.originFileObj)))
         },
         async createRequestExtended(){
-            let owner = this.customers.filter(a => a._id == this.form.client_id)[0]
+            let owner = this.customers.filter(a => a._id == this.form.client_id)[0], oid = Math.floor(Math.random()*90000) + 10000
             if(!owner) return message.error(`Ce client n'existe pas`)
 
-            this.form = {...this.form, ...{_id: generate(), due: dayjs(this.dueDate || new Date()).format(), orderid: Math.floor(Math.random()*90000) + 10000}}
+            this.form = {...this.form, ...{_id: generate(), due: dayjs(this.dueDate || new Date()).format(), orderid: oid }}
             await setDoc(doc(db, "requests", this.form._id),  this.form);
             //@reset attrs
             this.loadBtn = false
             this.visible = false
 
-            let msg = `Bonjour ${owner.fname} ${owner.lname} <br><br> La demande à bien été pris en compte 👍 <br> Je vous contacterai si besoin d'info supplémentaire. <br> 🙂 Merci`
-            this.form = {}
+            let msg = `Bonjour, Votre demande {RID} a bien été reçu pour le véhicule {marque}; {modele}; {CRN} Nous reviendrons vers vous si besoin d’informations supplémentaires, Merci`
             if(this.admin == 'customer'){
               let msg1 = `Hi E-volts Automobiles, you have a new requests from  one of your customers`
               return mailer(null, 'Service request', msg1)
             }
-            mailer(owner.email, 'Demande créée', msg)
+            let nMsg = mailConstructor(owner, this.form, msg)
+            mailer(owner.email, 'Demande créée', nMsg)
         },
         handleOk(){
             if(!this.form.client_id || !this.form.location || !this.form.urgency){
@@ -203,6 +203,7 @@ export default {
            if(this.locations.length == 0){
                 this.queryListener('locations')
             }
+            this.form = {}
             this.form = sAttrs.formAttr
             this.visible = true
         },

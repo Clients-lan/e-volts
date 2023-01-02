@@ -47,7 +47,7 @@
 import { Input, Button, Modal, message } from 'ant-design-vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth";
-import { auth, manageCookies, loginErr } from '../utils'
+import { auth, getCookie, manageCookies, loginErr } from '../utils'
 
 export default {
     components:{
@@ -62,8 +62,8 @@ export default {
         login(){
             this.loading = true
             signInWithEmailAndPassword(auth, this.form.email, this.form.password).then(userCredential => {
-                const user = userCredential.user;
-                manageCookies(user.email, 'set')
+                manageCookies(userCredential.user, 'set')
+                setTimeout(() => location.href = '/requests', 500);
             }).catch((error) => {
                 const err = loginErr(error.message)
                 message.error(err);
@@ -91,8 +91,9 @@ export default {
     },
     mounted(){
         onAuthStateChanged(auth, (user) => {
-            if(user && location.hash !== '#reset'){
-              location.href = 'requests'
+            let cookie = getCookie('evolt-user')
+            if(cookie && cookie != null){
+              if(user && location.hash !== '#reset') location.href = 'requests'
             }
         })
         if(location.hash == '#reset'){
