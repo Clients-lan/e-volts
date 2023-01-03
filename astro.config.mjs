@@ -4,11 +4,11 @@ import { defineConfig } from 'astro/config';
 import vue from "@astrojs/vue";
 
 // https://astro.build/config
-import deno from '@astrojs/deno';
+import vercel from '@astrojs/vercel/serverless';
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [vue()],
   output: "server",
-  adapter: deno()
+  adapter: vercel()
 });
