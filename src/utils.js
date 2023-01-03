@@ -143,8 +143,8 @@ function getCookie(name) {
 
 
   const loginErr = (err) => {
-    let msg = err.includes('wrong-password') ? 'Incorrent password' : err.includes('user-not-found') ? 'This email is not reqistered' :
-    err.includes('email-already') ? 'That email address is already registered to a customer' : 'Temporary error! Please try again later'
+    let msg = err.includes('wrong-password') ? 'Mot de passe incorrect' : err.includes('user-not-found') ? "Cet e-mail n'est pas enregistré" :
+    err.includes('email-already') ? "Cette adresse e-mail est déjà enregistrée pour un client" : 'Erreur temporaire! Veuillez réessayer plus tard'
     return msg
   }
  
@@ -159,13 +159,13 @@ function getCookie(name) {
     .then(res => {
       message.success(res.msg)
     }).catch((err) => {
-        message.error(`Something is not right... ${err}`)              
+        message.error(`Quelque chose ne tourne pas rond... ${err}`)              
     })
   }
 
   const delDocument = async (family, id) => {
     await deleteDoc(doc(db, family, id));
-    message.success(`Item successfully deleted from ${family} `)
+    message.success(`Élément supprimé avec succès`)
     if(family == 'requests') return setTimeout(() => location.href = '/requests', 600);
   }
   
