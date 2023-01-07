@@ -100,7 +100,7 @@
                     <a-textarea v-model:value="form.desc" placeholder="Décrivez le service ou les problèmes" :rows="4" required />
                 </div>
                 <div class="ui-form">
-                    <a-upload-dragger name="file" :multiple="true" @change="attachFiles">
+                    <a-upload-dragger name="file" accept="*" :multiple="true" @change="attachFiles">
                     <p class="ant-upload-drag-icon">
                        <CloudUploadOutlined />
                     </p>

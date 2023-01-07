@@ -114,7 +114,7 @@
                          <p class="mt-10" v-if="admin == 'admin'"><a-switch size="small" @change="watching(checked, 'post')" v-model:checked="checked"></a-switch>  <span class="inline">Notify {{ owner.fname }} about your new message</span></p>
                         <hr class="mt-10">
                         <div class="grid grid-2">
-                            <a-upload :multiple="true" @change="handleChange">
+                            <a-upload accept="*" :multiple="true" @change="handleChange">
                                 <a-button type="link">Ajouter des pièces jointes</a-button>
                             </a-upload>
                             <div>
